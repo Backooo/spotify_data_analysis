@@ -1,5 +1,5 @@
 from user_input import get_time_range
-from spotify_api_access import auth_spotify, get_top_tracks, get_top_artists, get_artist_info
+from spotify_api_access import auth_spotify, get_top_tracks, get_top_artists, get_artist_info, get_audio_features_per_track, get_playlists
 
 
 def main():
@@ -26,6 +26,18 @@ def main():
     print("Your top genres:\n")
     for genre, count in sort_genres:
         print(f"{count} artists in {genre}")
+    print("\n--------------------------------------------------- \n")
+    print("Analysis of your Top Tracks Audio Features:\n")
+    audio_features = get_audio_features_per_track(sp, time_range)
+    for track, feature in zip(top_tracks['items'], audio_features):
+        if feature:
+            print(f"Track: {track['name']} by {' '.join([artist['name'] for artist in track['artists']])}")
+            print(f"Danceability: {feature['danceability']}, Energy: {feature['energy']}, Valence: {feature['valence']}")
+    print("\n--------------------------------------------------- \n")
+    print("Your Playlists:\n")
+    playlists = get_playlists(sp)
+    for playlist in playlists:
+        print(f"{playlist['name']} - {playlist['tracks']['total']} Tracks")
 
 
 if __name__ == "__main__":
