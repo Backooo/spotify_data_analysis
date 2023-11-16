@@ -30,3 +30,15 @@ def auth_spotify():
 
 def get_top_tracks(sp, time_range):
     return sp.current_user_top_tracks(time_range=time_range)
+
+
+def get_top_artists(sp, time_range):
+    return sp.current_user_top_artists(time_range=time_range)
+
+
+def get_artist_info(sp, artist_id):
+    return sp.artist(artist_id)
+
+def get_top_artist_genres(sp, time_range):
+    top_artists = get_top_artists(sp, time_range=time_range)
+    artist_genres = {}
