@@ -8,9 +8,8 @@ This project aims at analyzing data from the Spotify API to visualize your own c
 Key features I want to include:
 - Visualization of top artists, songs, and genres over selected period
 - Data presentation in a user-friendly interface
+- Frontend Interface made with React
 - Playlist analysis
-- Recommendations
-- Compare with Global Trends
 
 ## Dependencies
 - spotipy (To interact with the Spotify Web API)
