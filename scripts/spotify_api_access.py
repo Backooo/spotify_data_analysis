@@ -10,7 +10,7 @@ def auth_spotify():
     client_id = os.getenv("SPOTIFY_CLIENT_ID")
     client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
     redirect_uri = os.getenv("SPOTIFY_REDIRECT_URI")
-    scope = "user-top-read playlist-read-private playlist-read-collaborative"
+    scope = "user-top-read playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private"
 
     sp_oauth = SpotifyOAuth(client_id, client_secret, redirect_uri, scope=scope)
 
@@ -40,20 +40,72 @@ def get_artist_info(sp, artist_id):
     return sp.artist(artist_id)
 
 
-def get_audio_features_per_track(sp, time_range):
-    tracks = get_top_tracks(sp, time_range=time_range)
-    track_ids = [track['id'] for track in tracks['items']]
-    return sp.audio_features(track_ids)
-
-
 def get_playlists(sp):
-    playlists = []
-    response = sp.current_user_playlists(limit=50)
+    response = sp.current_user_playlists()
+    if response:
+        return response['items']
+    else:
+        print("Fehler beim Abrufen der Playlists.")
+        return []
+
+
+def get_tracks_from_playlists(sp, playlist_id):
+    playlist_tracks = []
+    response = sp.playlist_tracks(playlist_id, limit=100)
 
     while response:
-        playlists.extend(response['items'])
+        playlist_tracks.extend(response['items'])
         if response['next']:
             response = sp.next(response)
         else:
             break
-    return playlists
+    return playlist_tracks
+
+
+def get_genres_of_track(sp, track_id):
+    track_info = sp.track(track_id)
+    artist_ids = [artist['id'] for artist in track_info['artists']]
+
+    genres = set()
+    for artist_id in artist_ids:
+        artist_info = sp.artist(artist_id)
+        genres.update(artist_info['genres'])
+
+    return list(genres)
+
+
+def analyze_playlist_artists_genres(sp, playlist_id):
+    playlist_tracks = get_tracks_from_playlists(sp, playlist_id)
+    genre_count_playlist = {}
+
+    for item in playlist_tracks:
+        track = item['track']
+        artists = track['artists']
+        for artist in artists:
+            artist_info = get_artist_info(sp, artist['id'])
+            for genre in artist_info['genres']:
+                genre_count_playlist[genre] = genre_count_playlist.get(genre, 0) + 1
+
+    return genre_count_playlist
+
+
+def create_super_playlist_from_top_tracks(sp, time_range, playlist_name="My Top 50 Tracks", max_tracks=100):
+    choice = input("Create a Super-Playlist of your Top Tracks from chosen time range? (y/n): ")
+
+    if choice != "y":
+        return
+
+    top_tracks = []
+    response = sp.current_user_top_tracks(limit=50, time_range=time_range)
+    while response and len(top_tracks) < max_tracks:
+        top_tracks.extend(response['items'])
+        if response['next'] and len(top_tracks) < max_tracks:
+            response = sp.next(response)
+        else:
+            break
+
+    track_ids = [track['id'] for track in top_tracks[:max_tracks]]
+    user_id = sp.me()['id']
+    playlist = sp.user_playlist_create(user_id, playlist_name)
+    sp.playlist_add_items(playlist['id'], track_ids)
+    print(f"Playlist '{playlist_name}' created with {len(track_ids)} tracks.")

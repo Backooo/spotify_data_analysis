@@ -4,6 +4,7 @@ def get_time_range():
     print("2: 6 Months")
     print("3: Multiple Years")
     choice = input("Choose 1, 2 or 3: ")
+    print("\n--------------------------------------------------- \n")
 
     if choice == "1":
         return "short_term"
