@@ -14,6 +14,5 @@ Key features I want to include:
 
 ## Dependencies
 - spotipy (To interact with the Spotify Web API)
-- pandas (To analyse data)
 - matplotlib (For static visualizations)
 - dotenv (handle Spotify API credentials without hardcoding)
