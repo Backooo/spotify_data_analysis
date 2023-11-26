@@ -3,7 +3,7 @@ Your very own **Spotify Wrapped** for any time of the year
 
 ## Overview
 
-This project aims at analyzing data from the Spotify API to visualize your own custom Spotify Wrapped that can be accessed any time of the year.
+This project aims at analyzing data from the Spotify API to visualize your own custom Spotify Wrapped that can be accessed any time of the year
 
 ## Key Features
 - Visualization of top artists, songs, and genres over chosen time period
@@ -17,10 +17,10 @@ This project aims at analyzing data from the Spotify API to visualize your own c
 
 ## Getting Your Spotify API Credentials
 To use this project, you need to register your application with Spotify and obtain the necessary credentials. Follow these steps:
-1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
-2. Log in with your Spotify account (or create one if you don't have it yet).
-3. Click on 'Create an App'. Fill in the form with your app details.
-4. Once your app is created, you will see your Client ID and Secret. Add these to your `.env` file as described in the Installation section.
+1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
+2. Log in with your Spotify account (or create one if you don't have it yet)
+3. Click on 'Create an App'. Fill in the form with your app details
+4. Once your app is created, you will see your Client ID and Secret. Add these to your `.env` file as described in the Installation section
 
 ## Installation
 1. Clone the repository: `git clone [repository URL]`
@@ -34,5 +34,5 @@ To use this project, you need to register your application with Spotify and obta
      ```
 ## Usage
 To run the script:
-1. Navigate to the project directory.
-2. Run `python main.py` and follow the prompts to select your time range for analysis.
+1. Navigate to the project directory
+2. Run `python main.py` and follow the prompts to select your time range for analysis
