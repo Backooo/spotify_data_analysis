@@ -84,7 +84,7 @@ def plot_playlist_boxplots(playlists_features):
 
     plt.figure(figsize=(10, 6))
     plt.boxplot(playlists_features, labels=labels)
-    plt.title('Verteilung der Audio-Features über Playlists')
+    plt.title('Distribution of Audio-Features in Playlists')
     plt.ylabel('Werte')
 
     plt.tight_layout()
