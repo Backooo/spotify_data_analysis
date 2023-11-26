@@ -61,16 +61,31 @@ def plot_genre_distribution_pie(genre_dist):
     plt.show()
 
 
-def plot_playlist_features(playlists_features):
-    plt.figure(figsize=(10, 6))
+def plot_playlist_features(playlists_features, playlist_names):
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
 
-    for features in playlists_features:
+    for features, name in zip(playlists_features, playlist_names):
         energy = [feature['energy'] for feature in features]
         danceability = [feature['danceability'] for feature in features]
-        plt.scatter(energy, danceability)
+        valence = [feature['valence'] for feature in features]
+        ax.scatter(energy, danceability, valence, label=name)
 
-    plt.xlabel('Energy')
-    plt.ylabel('Danceability')
-    plt.title('Energy vs Danceability in Playlists')
-    plt.legend([f'Playlist {i + 1}' for i in range(len(playlists_features))])
+    ax.set_xlabel('Energy')
+    ax.set_ylabel('Danceability')
+    ax.set_zlabel('Valence')
+    ax.set_title('Energy vs Danceability vs Valence in Playlists')
+    ax.legend()
+    plt.show()
+
+
+def plot_playlist_boxplots(playlists_features):
+    labels = ['Danceability', 'Valence', 'Energy']
+
+    plt.figure(figsize=(10, 6))
+    plt.boxplot(playlists_features, labels=labels)
+    plt.title('Verteilung der Audio-Features über Playlists')
+    plt.ylabel('Werte')
+
+    plt.tight_layout()
     plt.show()

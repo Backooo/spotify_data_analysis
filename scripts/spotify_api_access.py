@@ -44,8 +44,7 @@ def get_top_tracks(sp, time_range):
 
 
 def get_top_artists(sp, time_range):
-    top_artists = sp.current_user_top_artists(time_range=time_range)['items']
-    return top_artists
+    return sp.current_user_top_artists(time_range=time_range)['items']
 
 
 def get_artist_info(sp, artist_id):
@@ -71,45 +70,6 @@ def get_tracks_from_playlists(sp, playlist_id):
         else:
             break
     return playlist_tracks
-
-
-def get_playlist_content(sp, playlist_id):
-    playlist_tracks = get_tracks_from_playlists(sp, playlist_id)
-    genre_count_playlist = {}
-    popularity_sum = 0
-    max_popularity = 0
-    min_popularity = 100
-
-    for item in playlist_tracks:
-        track = item['track']
-        track_genres = get_genres_of_track(sp, track['id'])
-        for genre in track_genres:
-            genre_count_playlist[genre] = genre_count_playlist.get(genre, 0) + 1
-        popularity = track['popularity']
-        popularity_sum += popularity
-        max_popularity = max(max_popularity, popularity)
-        min_popularity = min(min_popularity, popularity)
-
-    sorted_genres_playlist = sorted(genre_count_playlist.items(), key=lambda x: x[1], reverse=True)
-    for genre, count in sorted_genres_playlist:
-        print(f"{count} Tracks in {genre}")
-
-    average_popularity = popularity_sum / len(playlist_tracks) if playlist_tracks else 0
-    print(f"\nAverage Popularity: {average_popularity}")
-    print(f"Max Popularity: {max_popularity}")
-    print(f"Min Popularity: {min_popularity}")
-
-
-def get_genres_of_track(sp, track_id):
-    track_info = sp.track(track_id)
-    artist_ids = [artist['id'] for artist in track_info['artists']]
-
-    genres = set()
-    for artist_id in artist_ids:
-        artist_info = sp.artist(artist_id)
-        genres.update(artist_info['genres'])
-
-    return list(genres)
 
 
 def analyze_playlist_artists_genres(sp, playlist_id):
@@ -149,19 +109,6 @@ def create_super_playlist_from_top_tracks(sp, time_range, playlist_name="My Top 
     print(f"Playlist '{playlist_name}' created with {len(track_ids)} tracks.")
 
 
-def get_audio_features(sp, time_range):
-    top_tracks = sp.current_user_top_tracks(time_range=time_range)['items']
-    audio_features = sp.audio_features([track['id'] for track in top_tracks])
-    for track, feature in zip(top_tracks[:5], audio_features):
-        if feature:
-            print(f"Track: {track['name']} by {' '.join([artist['name'] for artist in track['artists']])}")
-            print(f"Danceability: {feature['danceability']}, Energy: {feature['energy']}, Valence: {feature['valence']}")
-
-
-def audio_features_per_track(sp, track_ids):
-    return sp.audio_features(track_ids)
-
-
 def get_genre_distribution(top_artists):
     genre_count = {}
     for artist in top_artists:
@@ -183,3 +130,31 @@ def get_playlist_tracks_features(sp, playlist_id):
     track_ids = [track['track']['id'] for track in playlist_tracks]
     features = sp.audio_features(track_ids)
     return features
+
+
+def calculate_playlist_averages(sp, playlist_id):
+    tracks = get_tracks_from_playlists(sp, playlist_id)
+    track_ids = [track['track']['id'] for track in tracks]
+
+    features = sp.audio_features(track_ids)
+    if not features:
+        return None
+
+    total_danceability = total_valence = total_energy = 0
+    valid_features_count = 0
+
+    for feature in features:
+        if feature:
+            total_danceability += feature['danceability']
+            total_valence += feature['valence']
+            total_energy += feature['energy']
+            valid_features_count += 1
+
+    if valid_features_count > 0:
+        return {
+            'average_danceability': total_danceability / valid_features_count,
+            'average_valence': total_valence / valid_features_count,
+            'average_energy': total_energy / valid_features_count
+        }
+    else:
+        return None

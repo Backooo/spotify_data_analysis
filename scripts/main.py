@@ -27,15 +27,41 @@ def main():
 
     print("\n--------------------------------------------------- \n")
     print("Analysis of your Top Tracks Audio Features:\n")
-    get_audio_features(sp, time_range)
-    audio_features = audio_features_per_track(sp, tracks_ids)
+    top_tracks, track_ids = get_top_tracks(sp, time_range)
+    audio_features = sp.audio_features(track_ids)
+
+    for track, features in zip(top_tracks, audio_features):
+        print(f"Track: {track['name']} by {track['artists']}")
+        print(
+            f"Danceability: {features['danceability']}, Energy: {features['energy']}, Valence: {features['valence']}\n")
+
     plot_audio_features(top_tracks, audio_features)
 
     print("\n--------------------------------------------------- \n")
+    print("Playlist Feature Analysis:\n")
     playlists = get_playlists(sp)[:3]
-    playlists_features = [get_playlist_tracks_features(sp, playlist['id']) for playlist in playlists]
-    plot_playlist_features(playlists_features)
+    playlist_names = [playlist['name'] for playlist in playlists]
+    all_playlists_features = [get_playlist_tracks_features(sp, playlist['id']) for playlist in playlists]
 
+    plot_playlist_features(all_playlists_features, playlist_names)
+
+    playlists = get_playlists(sp)[:3]
+    danceability_list, valence_list, energy_list = [], [], []
+    for playlist in playlists:
+        averages = calculate_playlist_averages(sp, playlist['id'])
+        if averages:
+            print(f"\n{playlist['name']} - {playlist['tracks']['total']} Tracks")
+            print(f"Average Danceability: {averages['average_danceability']:.2f}")
+            print(f"Average Valence: {averages['average_valence']:.2f}")
+            print(f"Average Energy: {averages['average_energy']:.2f}")
+            danceability_list.append(averages['average_danceability'])
+            valence_list.append(averages['average_valence'])
+            energy_list.append(averages['average_energy'])
+        else:
+            print(f"\n{playlist['name']} - No data available")
+    plot_playlist_boxplots([danceability_list, valence_list, energy_list])
+
+    print("\n--------------------------------------------------- \n")
     create_super_playlist_from_top_tracks(sp, time_range, max_tracks=100)
 
 
